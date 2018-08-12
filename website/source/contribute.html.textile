@@ -30,6 +30,15 @@ get a place in the space below for lifetime.
 
 h2. Thanks for all the fish -- Contributions
 
+* *Chris Wendt* ("chrismwendt":https://github.com/chrismwendt) for the 'ignore'
+  atom and other improvements!
+
+* *Raphaël Simon* ("raphael":https://github.com/raphael) for a nice contextual 
+  error reporter!
+
+* *Dan Freeman* ("dfreeman":https://github.com/dfreeman) for allowing rules 
+  to be inherited!
+
 * *Rory O’Kane* ("roryokane":https://github.com/roryokane) for a careful code 
   review!
 

@@ -2,17 +2,15 @@
 
 Gem::Specification.new do |s|
   s.name = 'parslet'
-  s.version = '1.7.0'
+  s.version = '1.8.2'
 
   s.authors = ['Kaspar Schiess']
   s.email = 'kaspar.schiess@absurd.li'
   s.extra_rdoc_files = ['README']
-  s.files = %w(HISTORY.txt LICENSE Rakefile README) + Dir.glob("{lib,example}/**/*")
-  s.homepage = 'http://kschiess.github.com/parslet'
+  s.files = %w(HISTORY.txt LICENSE Rakefile README parslet.gemspec) + Dir.glob("{lib,spec,example}/**/*")
+  s.homepage = 'http://kschiess.github.io/parslet'
   s.license = 'MIT'
   s.rdoc_options = ['--main', 'README']
   s.require_paths = ['lib']
-  s.summary = 'Parser construction library with great error reporting in Ruby.'  
-  
-  s.add_dependency 'blankslate', '~> 2.0'
+  s.summary = 'Parser construction library with great error reporting in Ruby.'
 end

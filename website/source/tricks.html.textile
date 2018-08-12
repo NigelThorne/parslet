@@ -2,6 +2,8 @@
 title: Tricks for common situations
 ---
 
+Here's a topic overview: <div id="toc"></div>
+
 h2. Matching EOF (End Of File)
 
 Ahh Sir, you'll be needin what us parsers call _epsilon_: 
@@ -67,16 +69,16 @@ I find it very useful in this situation to eliminate 2. from our options:
     rule(:simple_rule) { str('a') }
   end
 
-  describe ComplexParser  do
+  RSpec.describe ComplexParser  do
     let(:parser) { ComplexParser.new }
     context "simple_rule" do
       it "should consume 'a'" do
-        parser.simple_rule.should parse('a')
+        expect(parser.simple_rule).to parse('a')
       end 
     end
   end
   
-  RSpec::Core::Runner.run([])
+  RSpec::Core::Runner.run(['--format', 'documentation'])
 </code></pre>
 
 Output is: 
@@ -86,7 +88,7 @@ Example::ComplexParser
   simple_rule
     should consume 'a'
 
-Finished in 0.00115 seconds
+Finished in 0.00094 seconds (files took 0.29367 seconds to load)
 1 example, 0 failures
 </pre>
 
@@ -103,7 +105,7 @@ handling code that will help you out:
   begin
     parser.parse('bar')
   rescue Parslet::ParseFailed => error
-    puts error.cause.ascii_tree
+    puts error.parse_failure_cause.ascii_tree
   end
 </code></pre>
 
@@ -143,7 +145,7 @@ grammar structure:
   begin
     P.new.parse('barbaz')
   rescue Parslet::ParseFailed => error
-    puts error.cause.ascii_tree
+    puts error.parse_failure_cause.ascii_tree
   end
 </code></pre>
 
@@ -172,7 +174,7 @@ with the 'deepest error position' engine:
   begin
     P.new.parse('barbaz', reporter: Parslet::ErrorReporter::Deepest.new)
   rescue Parslet::ParseFailed => error
-    puts error.cause.ascii_tree
+    puts error.parse_failure_cause.ascii_tree
   end
 </code></pre>
 
@@ -208,4 +210,18 @@ message:
   puts "Sorry. Can't have #{type} at #{line}:#{col}!"
 </code></pre>
 
+h2. Precedence climber
 
+You might want to implement a parser for simple arithmetic infix expressions
+such as `1 + 2`. The quickest way to do this with parslet is to use the 
+infix expression parser atom: 
+
+<pre class="sh_ruby"><code>
+  infix_expression(
+    match('[0-9]').repeat,
+    [str('*'), 2],
+    [str('+'), 1]) # matches both "1+2*3" and "1*2+3"
+</code></pre>
+
+Please also see the "example":https://github.com/kschiess/parslet/blob/master/example/prec_calc.rb and
+the "inline documentation":https://github.com/kschiess/parslet/blob/master/lib/parslet.rb#L203-L229 for this feature. 

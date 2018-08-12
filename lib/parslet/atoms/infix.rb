@@ -1,15 +1,16 @@
 class Parslet::Atoms::Infix < Parslet::Atoms::Base
-  attr_reader :element, :operations
+  attr_reader :element, :operations, :reducer
 
-  def initialize(element, operations)
+  def initialize(element, operations, &reducer)
     super()
 
     @element = element
     @operations = operations
+    @reducer = reducer || lambda { |left, op, right| {l: left, o: op, r: right} }
   end
   
   def try(source, context, consume_all)
-    return catch_error {
+    return catch(:error) {
       return succ(
         produce_tree(
           precedence_climb(source, context, consume_all)))
@@ -31,9 +32,9 @@ class Parslet::Atoms::Infix < Parslet::Atoms::Base
 
       if right.kind_of? Array
         # Subexpression -> Subhash
-        left = {l: left, o: op, r: produce_tree(right)}
+        left = reducer.call(left, op, produce_tree(right))
       else
-        left = {l: left, o: op, r: right}
+        left = reducer.call(left, op, right)
       end
     end
 
@@ -55,7 +56,7 @@ class Parslet::Atoms::Infix < Parslet::Atoms::Base
     success, value = @element.apply(source, context, false)
     
     unless success
-      abort context.err(self, source, "#{@element.inspect} was expected", [value])
+      throw :error, context.err(self, source, "#{@element.inspect} was expected", [value])
     end
 
     result << flatten(value, true)
@@ -105,13 +106,6 @@ class Parslet::Atoms::Infix < Parslet::Atoms::Base
     end
 
     return nil
-  end
-
-  def abort(error)
-    throw :error, error
-  end
-  def catch_error
-    catch(:error) { yield }
   end
 
   def to_s_inner(prec)

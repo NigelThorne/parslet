@@ -6,10 +6,6 @@ describe Parslet::Transform do
   include Parslet
   
   let(:transform) { Parslet::Transform.new }
-  attr_reader :transform
-  before(:each) do
-    @transform = Parslet::Transform.new
-  end
   
   class A < Struct.new(:elt); end
   class B < Struct.new(:elt); end
@@ -68,13 +64,54 @@ describe Parslet::Transform do
   end
   describe "class construction" do
     class OptimusPrime < Parslet::Transform 
-      rule(simple(:x)) { A.new(x) }
+      rule(:a => simple(:x)) { A.new(x) }
+      rule(:b => simple(:x)) { B.new(x) }
     end
     let(:transform) { OptimusPrime.new }
     
     it "should evaluate rules" do
-      transform.apply('a').should == A.new('a')
-    end 
+      transform.apply(:a => 'a').should == A.new('a')
+    end
+
+    context "optionally raise when no match found" do
+      class BumbleBee < Parslet::Transform
+        def initialize(&block)
+          super(raise_on_unmatch: true, &block)
+        end
+        rule(:a => simple(:x)) { A.new(x) }
+      end
+      let(:transform) { BumbleBee.new }
+
+      it "should evaluate rules" do
+        transform.apply(:a => 'a').should == A.new('a')
+      end
+
+      it "should raise when no rules are matched" do
+        lambda {
+          transform.apply(:z => 'z')
+        }.should raise_error(NotImplementedError, /Failed to match/)
+      end
+    end
+
+    context "with inheritance" do
+      class OptimusPrimeJunior < OptimusPrime
+        rule(:b => simple(:x)) { B.new(x.upcase) }
+        rule(:c => simple(:x)) { C.new(x) }
+      end
+      let(:transform) { OptimusPrimeJunior.new }
+
+      it "should inherit rules from its parent" do
+        transform.apply(:a => 'a').should == A.new('a')
+      end
+
+      it "should be able to override rules from its parent" do
+        transform.apply(:b => 'b').should == B.new('B')
+      end
+
+      it "should be able to define new rules" do
+        transform.apply(:c => 'c').should == C.new('c')
+      end
+    end
   end
   describe "<- #call_on_match" do
     let(:bindings) { { :foo => 'test' } }
@@ -116,7 +153,9 @@ describe Parslet::Transform do
       it "should execute in its own context" do
         @bar = 'test'
         transform.call_on_match(bindings, proc do
-          @bar.should_not == 'test'
+          if instance_variable_defined?("@bar")
+            instance_variable_get("@bar").should_not == 'test'
+          end
         end)
       end
     end

@@ -1,13 +1,38 @@
+
 = 2.0 / ?? (future release changes, like a reminder to self)
   
   - prsnt? and absnt? are now finally banned into oblivion. Wasting vocals for
     the win. 
+    
+= 1.8.2 / 13Feb2018
 
-= 1.7 / ???
+  ! Improvements to performance in cases where atoms are dynamically generated
+    (Kevin Olbrich).
+    
+= 1.8.1 / 19Nov2017
+
+  - Minor fixes for language compatibility. 
+    
+= 1.8 / 3Apr2017
+
+  + The `ignored` atom that allows to ignore a part of the matched text. 
+    `str('foo').ignore` will match 'foo', but not yield any parse output. 
+    Thanks to chrismwendt (Chris Wendt).
+  + Infix expression parser (arithmetics, anyone?) now supports custom reducers
+    in block form. Thanks to chrismwendt (Chris Wendt).
+  ! Small patches to memory footprint (Christophe Bliard).
+  - blankslate dependency removed. You should be good - but if things break, 
+    please let us know (Nikita Shilnikov).
+  ! Parslet now has `parse_failure_cause`, replaces the earlier `cause`.
+  ! Fixes all these interpreter warnings on modern rubies. 
+
+= 1.7 / 12Mar2015
 
   ! Small speed gains from improvements on the hot spots. 
+  + Contextual error reporter, a flavor of error reporting that emphasizes 
+    context. 
 
-= 1.6 / 1May2014
+= 1.6 / 1May2014, 13Okt14
 
   + EXPERIMENTAL: Parslet accelerators permit replacing parts of your parser 
     with optimized atoms using pattern matching. Look at 
@@ -27,6 +52,9 @@
 
   ! A few small bug fixes and optimisations have been introduced. API should 
     remain unchanged. 
+
+  + More lenient on the blankslate version.
+  + Modernizes the test suite to run with rspec again. (!)
     
 = 1.5 / 27Dec2012
     

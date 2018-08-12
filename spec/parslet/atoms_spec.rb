@@ -49,7 +49,7 @@ describe Parslet do
         cause.to_s.should == "Expected at least 3 of [a] at line 1 char 1."
       end 
       it "should have a tree with 2 nodes" do
-        cause.children.should have(1).elements
+        cause.children.size.should == 1
       end 
     end
     it "should succeed on 'aaa'" do
@@ -117,7 +117,7 @@ describe Parslet do
         cause.to_s.should == "Failed to match sequence ('foo' 'bar') at line 1 char 4."
       end
       it "should have 2 nodes in error tree" do
-        cause.should have(1).children
+        cause.children.size.should == 1
       end 
     end
     it "should parse 'foobar'" do
@@ -142,7 +142,7 @@ describe Parslet do
         cause.to_s.should == "Expected one of ['foo', 'bar'] at line 1 char 1."
       end   
       it "should have an error tree with 3 nodes" do
-        cause.should have(2).children
+        cause.children.size.should == 2
       end 
     end
     
@@ -225,7 +225,7 @@ describe Parslet do
     
     it "should not loop infinitely" do
       lambda {
-        timeout(1) { parslet.parse('bar') }
+        Timeout.timeout(1) { parslet.parse('bar') }
       }.should raise_error(Parslet::ParseFailed)
     end 
   end
@@ -398,7 +398,7 @@ describe Parslet do
   end
 
   describe "combinations thereof (regression)" do
-    success=[
+    [
       [(str('a').repeat >> str('b').repeat), 'aaabbb'] 
     ].each do |(parslet, input)|
       describe "#{parslet.inspect} applied to #{input.inspect}" do
@@ -408,7 +408,7 @@ describe Parslet do
       end 
     end
 
-    inspection=[
+    [
       [str('a'),                              "'a'"                 ], 
       [(str('a') | str('b')).maybe,           "('a' / 'b')?"        ], 
       [(str('a') >> str('b')).maybe,          "('a' 'b')?"          ], 

@@ -3,8 +3,8 @@ html
   head
     meta(http-equiv="Content-type" content="text/html;charset=UTF-8")
     title
-      | parslet -
-      = data.page.title || 'parslet - beautiful parsers.'
+      | parslet - 
+      = current_page.data.title || 'parslet - beautiful parsers.'
       
     meta name='author' content="Kaspar Schiess (http://absurd.li)"
 
@@ -12,11 +12,13 @@ html
     == stylesheet_link_tag 'site'
     == stylesheet_link_tag 'sh_whitengrey'
     
+    == javascript_include_tag 'http://code.jquery.com/jquery-2.1.4.min.js'
+    == javascript_include_tag 'toc.js'
     == javascript_include_tag 'sh_main.min.js'
     == javascript_include_tag 'sh_ruby.min.js'
     
     
-  body.code onload="sh_highlightDocument();"
+  body.code onload="sh_highlightDocument(); $('#toc').toc({selectors: 'h2'});"
     #everything
       .main_menu
         == image_tag 'parsley_logo.png', alt: 'Parslet Logo'
@@ -29,13 +31,12 @@ html
           li== link_to('projects', 'projects.html')
           
       .content
-        h1= data.page.title || 'parslet - beautiful parsers.'
+        h1= current_page.data.title || 'parslet - beautiful parsers.'
         == yield
     
       .copyright
         textile:
-          MIT License, 2010-2014, (c) <a href="http://absurd.li">Kaspar Schiess</a><br/>
-          Logo by "Florian Hanke":http://floere.github.com, "CC Attribution":http://creativecommons.org/licenses/by/1.0/ license
+          MIT License, 2010-2018, (c) <a href="http://absurd.li">Kaspar Schiess</a><br/>
       
       javascript:
         var _gaq = _gaq || [];

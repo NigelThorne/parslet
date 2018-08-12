@@ -74,6 +74,10 @@ describe Parslet::Slice do
         subject { slice.size }
         it { should == 6 } 
       end
+      describe "<- #length" do
+        subject { slice.length }
+        it { should == 6 } 
+      end
       describe "<- #+" do
         let(:other) { cslice('baz', 10) }
         subject { slice + other }
@@ -108,7 +112,7 @@ describe Parslet::Slice do
           s.to_i.should == 1234
         end 
         it "should fail when Integer would fail on a string" do
-          lambda { Integer(slice) }.should raise_error
+          lambda { Integer(slice) }.should raise_error(ArgumentError, /invalid value/)
         end 
         it "should turn into zero when a string would" do
           slice.to_i.should == 0

@@ -14,9 +14,11 @@ class Parslet::Atoms::Lookahead < Parslet::Atoms::Base
     # Model positive and negative lookahead by testing this flag.
     @positive = positive
     @bound_parslet = bound_parslet
-    
-    @error_msgs = {
-      :positive => ["Input should start with ", bound_parslet], 
+  end
+
+  def error_msgs
+    @error_msgs ||= {
+      :positive => ["Input should start with ", bound_parslet],
       :negative => ["Input should not start with ", bound_parslet]
     }
   end
@@ -25,14 +27,14 @@ class Parslet::Atoms::Lookahead < Parslet::Atoms::Base
     rewind_pos  = source.bytepos
     error_pos   = source.pos
 
-    success, value = bound_parslet.apply(source, context, consume_all)
+    success, _ = bound_parslet.apply(source, context, consume_all)
     
     if positive
       return succ(nil) if success
-      return context.err_at(self, source, @error_msgs[:positive], error_pos)
+      return context.err_at(self, source, error_msgs[:positive], error_pos)
     else
       return succ(nil) unless success
-      return context.err_at(self, source, @error_msgs[:negative], error_pos)
+      return context.err_at(self, source, error_msgs[:negative], error_pos)
     end
     
   # This is probably the only parslet that rewinds its input in #try.
@@ -43,8 +45,8 @@ class Parslet::Atoms::Lookahead < Parslet::Atoms::Base
   
   precedence LOOKAHEAD
   def to_s_inner(prec)
-    char = positive ? '&' : '!'
-    
-    "#{char}#{bound_parslet.to_s(prec)}"
+    @char = positive ? '&' : '!'
+
+    "#{@char}#{bound_parslet.to_s(prec)}"
   end
 end

@@ -2,15 +2,15 @@
 <html>
   <head>
     <meta content="text/html;charset=UTF-8" http-equiv="Content-type" />
-    <title>parslet -Parser construction</title>
+    <title>parslet - Parser construction</title>
     <meta content="Kaspar Schiess (http://absurd.li)" name="author" />
     <link href="images/favicon3.ico" rel="shortcut icon" />
-    <link href="/parslet/stylesheets/site.css" rel="stylesheet" type="text/css" /><link href="/parslet/stylesheets/sh_whitengrey.css" rel="stylesheet" type="text/css" /><script src="/parslet/javascripts/sh_main.min.js" type="text/javascript"></script><script src="/parslet/javascripts/sh_ruby.min.js" type="text/javascript"></script>
+    <link href="/parslet/stylesheets/site.css" rel="stylesheet" /><link href="/parslet/stylesheets/sh_whitengrey.css" rel="stylesheet" /><script src="http://code.jquery.com/jquery-2.1.4.min.js"></script><script src="/parslet/javascripts/toc.js"></script><script src="/parslet/javascripts/sh_main.min.js"></script><script src="/parslet/javascripts/sh_ruby.min.js"></script>
   </head>
-  <body class="code" onload="sh_highlightDocument();">
+  <body class="code" onload="sh_highlightDocument(); $('#toc').toc({selectors: 'h2'});">
     <div id="everything">
       <div class="main_menu">
-        <img alt="Parslet Logo" src="/parslet/images/parsley_logo.png" />
+        <img src="/parslet/images/parsley_logo.png" alt="Parslet Logo" />
         <ul>
           <li>
             <a href="/parslet/">about</a>
@@ -103,8 +103,8 @@ to write the above <code>#match</code> atom:</p>
 some more examples of character ranges:</p>
 <pre class="sh_ruby"><code>
   match['[:alnum:]']      # letters and numbers
-  match['\\n']            # newlines
-  match('\\w')            # word characters
+  match['\n']             # newlines
+  match('\w')             # word characters
   match('.')              # any character
 </code></pre>
 <h3>The wild wild <code>#any</code></h3>
@@ -180,7 +180,7 @@ look at this:</p>
   #   arg &gt;&gt; (spaced(',') &gt;&gt; arg).repeat
   #
   def spaced(character)
-    str(character) &gt;&gt; match["\s"]
+    str(character) &gt;&gt; match['\s']
   end
 </code></pre>
 <p>or even this:</p>
@@ -234,7 +234,7 @@ tree (assuming a successful parse) on the right:</p>
 <p>Sometimes a parser needs to match against something that was already matched
 against. Think about Ruby heredocs for example:</p>
 <pre class="sh_ruby"><code>
-  str = &lt;-HERE
+  str = &lt;&lt;-HERE
     This is part of the heredoc.
   HERE
 </code></pre>
@@ -266,7 +266,7 @@ scope of this document) In such a block, you can:</p>
     
     # Or by .. doing other kind of work (consumes 100 chars and then 'a')
     source.consume(100)
-    return str('a')
+    str('a')
   }
 </code></pre>
 <h3>Scopes</h3>
@@ -294,10 +294,9 @@ is not what you signed up for.</p>
 <p>Time to introduce you to <a href="transform.html">Parslet::Transform</a> and its workings.</p>
       </div>
       <div class="copyright">
-        <p><span class="caps">MIT</span> License, 2010-2014, &#169; <a href="http://absurd.li">Kaspar Schiess</a><br/>
-        Logo by <a href="http://floere.github.com">Florian Hanke</a>, <a href="http://creativecommons.org/licenses/by/1.0/">CC Attribution</a> license</p>
+        <p><span class="caps">MIT</span> License, 2010-2018, &#169; <a href="http://absurd.li">Kaspar Schiess</a><br/></p>
       </div>
-      <script type="text/javascript">
+      <script>
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-16365074-2']);
         _gaq.push(['_trackPageview']);

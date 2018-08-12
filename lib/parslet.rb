@@ -55,13 +55,13 @@ module Parslet
   
   # Raised when the parse failed to match. It contains the message that should
   # be presented to the user. More details can be extracted from the
-  # exceptions #cause member: It contains an instance of {Parslet::Cause} that
+  # exceptions #parse_failure_cause member: It contains an instance of {Parslet::Cause} that
   # stores all the details of your failed parse in a tree structure. 
   #
   #   begin
   #     parslet.parse(str)
   #   rescue Parslet::ParseFailed => failure
-  #     puts failure.cause.ascii_tree
+  #     puts failure.parse_failure_cause.ascii_tree
   #   end
   #
   # Alternatively, you can just require 'parslet/convenience' and call the
@@ -72,15 +72,15 @@ module Parslet
   #   parslet.parse_with_debug(str)
   #
   class ParseFailed < StandardError
-    def initialize(message, cause=nil)
+    def initialize(message, parse_failure_cause=nil)
       super(message)
-      @cause = cause
+      @parse_failure_cause = parse_failure_cause
     end
     
     # Why the parse failed. 
     #
     # @return [Parslet::Cause]
-    attr_reader :cause 
+    attr_reader :parse_failure_cause
   end
   
   module ClassMethods
@@ -99,7 +99,8 @@ module Parslet
     #     root :twobar
     #   end
     #
-    def rule(name, &definition)
+    def rule(name, opts={}, &definition)
+      undef_method name if method_defined? name
       define_method(name) do
         @rules ||= {}     # <name, rule> memoization
         return @rules[name] if @rules.has_key?(name)
@@ -109,7 +110,7 @@ module Parslet
           self.instance_eval(&definition)
         }
         
-        @rules[name] = Atoms::Entity.new(name, &definition_closure)
+        @rules[name] = Atoms::Entity.new(name, opts[:label], &definition_closure)
       end
     end
   end
@@ -217,9 +218,17 @@ module Parslet
   # associativity is chosen, it would be interpreted as '1 + (2 + 3)'. Note 
   # that the hash trees output reflect that choice as well. 
   #
-  # Example:
+  # An optional block can be provided in order to manipulate the generated tree.
+  # The block will be called on each operator and passed 3 arguments: the left
+  # operand, the operator, and the right operand.
+  #
+  # Examples:
   #   infix_expression(integer, [add_op, 1, :left])
   #   # would parse things like '1 + 2'
+  #
+  #   infix_expression(integer, [add_op, 1, :left]) { |l,o,r| { :plus => [l, r] } }
+  #   # would parse '1 + 2 + 3' as:
+  #   # { :plus => [1, { :plus => [2, 3] }] }
   #
   # @param element [Parslet::Atoms::Base] elements that take the NUMBER position
   #    in the expression
@@ -227,8 +236,8 @@ module Parslet
   #  
   # @see Parslet::Atoms::Infix
   #
-  def infix_expression(element, *operations)
-    Parslet::Atoms::Infix.new(element, operations)
+  def infix_expression(element, *operations, &reducer)
+    Parslet::Atoms::Infix.new(element, operations, &reducer)
   end
   module_function :infix_expression
   
